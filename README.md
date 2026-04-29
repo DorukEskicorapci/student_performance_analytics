@@ -2,9 +2,15 @@
 
 ## Overview
 
-This project analyzes a student performance dataset to study the relationship between internet access and final exam performance. It also builds machine learning models to predict `final_exam_score` using student academic, behavioral, and demographic features.
+This project studies whether internet access is associated with student final exam performance. It also compares three regression models for predicting final_exam_score from student academic, behavioral, and demographic features.
 
-The project is designed to avoid data leakage. Columns such as `overall_score` and `grade` are removed before model training because they are likely calculated from student score variables.
+The project uses a leakage prevention step before model training. The columns overall_score and grade are removed because they are likely calculated from student score information and may indirectly reveal the target variable.
+
+## Research Questions
+
+1. Are students with internet access associated with higher final exam scores?
+2. Can final exam scores be predicted from the available student features?
+3. Does increasing model complexity improve prediction performance?
 
 ## Dataset
 
@@ -16,9 +22,11 @@ Expected dataset file name:
 
 student_performance_data.csv
 
-Place the dataset inside the `data` folder:
+Place the dataset inside the data folder:
 
 data/student_performance_data.csv
+
+The dataset contains 10,000 student records and 14 columns.
 
 ## Project Structure
 
@@ -32,10 +40,8 @@ student_performance_project/
   src/
     config.py
     data_utils.py
-    eda.py
-    modeling.py
-    stats_analysis.py
-    extra_figures.py
+    train_models.py
+    make_figures.py
     make_all.py
   README.md
   requirements.txt
@@ -48,8 +54,6 @@ pandas
 numpy
 matplotlib
 scikit-learn
-scipy
-statsmodels
 
 Install all required packages with:
 
@@ -71,95 +75,92 @@ python src/make_all.py
 
 This command runs the full project pipeline:
 
-Exploratory data analysis
-Model training
-Model evaluation
-Statistical analysis
-Extra figure generation
+1. Loads and checks the dataset
+2. Removes leakage and target columns from the feature matrix
+3. Trains the three regression models
+4. Evaluates models with RMSE, MAE, and R2
+5. Saves model results and predictions
+6. Creates figures for the report
 
 ## Running Files Separately
 
 You can also run each script separately.
 
-Run exploratory data analysis:
-
-py src/eda.py
-
 Run model training and evaluation:
 
-py src/modeling.py
+py src/train_models.py
 
-Run statistical analysis:
+Create report figures:
 
-py src/stats_analysis.py
-
-Create extra report figures:
-
-py src/extra_figures.py
+py src/make_figures.py
 
 ## Source Code Files
 
-### `src/config.py`
+### src/config.py
 
-Stores project settings, including file paths, target variable, feature lists, leakage columns, and train test split settings.
+Stores project settings, including file paths, target variable, feature lists, leakage columns, test size, and random seed.
 
-### `src/data_utils.py`
+### src/data_utils.py
 
-Loads the dataset, checks required columns, prints basic dataset information, and creates the feature matrix and target variable.
+Loads the dataset, checks required columns, prints basic dataset information, and creates the feature matrix X and target variable y.
 
-### `src/eda.py`
-
-Creates exploratory data analysis tables and figures.
-
-### `src/modeling.py`
+### src/train_models.py
 
 Trains and evaluates the prediction models.
 
 Models included:
 
-Mean baseline
-Linear regression
-Random forest regression
+1. Linear Regression
+2. Random Forest Regression
+3. Neural Network Regression
 
-### `src/stats_analysis.py`
+The script saves:
 
-Runs statistical analysis for internet access and final exam score.
+results/model_results.csv
+results/test_predictions.csv
 
-Methods included:
+### src/make_figures.py
 
-Group summary
-Welch's t test
-Cohen's d
-Controlled regression
+Creates figures used in the final report.
 
-### `src/extra_figures.py`
+Figures created:
 
-Creates additional figures used in the final report.
+figures/final_exam_score_distribution.png
+figures/mean_score_by_internet_access.png
+figures/model_comparison_rmse.png
+figures/model_comparison_mae.png
+figures/linear_regression_actual_vs_predicted.png
+figures/random_forest_regression_actual_vs_predicted.png
+figures/neural_network_regression_actual_vs_predicted.png
 
-### `src/make_all.py`
+### src/make_all.py
 
-Runs all project scripts in order.
+Runs the full pipeline by executing train_models.py and make_figures.py.
 
 ## Output Folders
 
-### `figures/`
+### figures/
 
-Stores generated plots used for analysis and the report.
+Stores generated plots used in the final report.
 
-### `results/`
+Expected outputs include:
 
-Stores generated CSV and text files from the analysis.
+final_exam_score_distribution.png
+mean_score_by_internet_access.png
+model_comparison_rmse.png
+model_comparison_mae.png
+linear_regression_actual_vs_predicted.png
+random_forest_regression_actual_vs_predicted.png
+neural_network_regression_actual_vs_predicted.png
+
+### results/
+
+Stores generated CSV files from model training and evaluation.
 
 Expected outputs include:
 
 model_results.csv
-internet_access_ttest_results.csv
-internet_access_score_summary.csv
-controlled_regression_summary.txt
-controlled_regression_coefficients.csv
-random_forest_feature_importance.csv
-numeric_summary.csv
-missing_values.csv
+test_predictions.csv
 
 ## Data Leakage Prevention
 
@@ -179,11 +180,44 @@ grade is likely calculated from score variables.
 
 Removing these columns makes the prediction task more realistic.
 
+## Models
+
+This project compares three levels of model complexity.
+
+### Linear Regression
+
+This is the basic model. It is simple and interpretable.
+
+### Random Forest Regression
+
+This is the medium complexity model. It can capture nonlinear patterns and feature interactions.
+
+### Neural Network Regression
+
+This is the complex model. It uses a multilayer perceptron with two hidden layers.
+
+## Evaluation Metrics
+
+The models are evaluated with:
+
+RMSE
+MAE
+R2
+
+Lower RMSE and MAE values are better.
+
+R2 shows how much variation in final_exam_score is explained by the model.
+
 ## Notes
 
 Before running the project, make sure:
 
-The dataset is downloaded from Kaggle.
-The dataset is named student_performance_data.csv.
-The dataset is placed inside the data folder.
-All required packages are installed.
+1. The dataset is downloaded from Kaggle.
+2. The dataset is named student_performance_data.csv.
+3. The dataset is placed inside the data folder.
+4. All required packages are installed.
+5. You run commands from the main project folder.
+
+## Main Result Summary
+
+The project finds a small descriptive difference in mean final exam score between students with and without internet access. However, the three prediction models perform weakly after removing outcome related variables. This suggests that the available input features do not contain strong predictive signal for individual final exam scores.
